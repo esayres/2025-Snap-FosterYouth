@@ -11,6 +11,7 @@ import FriendStory from "../screens/FriendStory";
 import AstrologyScreen from "../screens/AstrologyScreen";
 import MemoryScreen from "../screens/MemoryScreen";
 import EventScreen from "../screens/EventScreen"; //New component by Sona and Christian
+import NonProfitCommunityScreen from "../screens/NonProfitCommunityScreen"
 
 const Stack = createStackNavigator();
 
@@ -69,6 +70,12 @@ export default function App() {
           component={EventScreen}
           options={{ headerShown: true }}
         />
+        <Stack.Screen
+          name="NonProfitCommunity"
+          component={NonProfitCommunityScreen}
+          options={{ headerShown: true }}
+        />
+        
       </Stack.Navigator>
     </NavigationContainer>
   );
