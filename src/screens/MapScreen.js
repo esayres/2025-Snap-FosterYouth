@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { markers } from "../../assets/markers.js";
+
 
 import { createClient } from "@supabase/supabase-js";
 const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
@@ -56,12 +56,12 @@ Marker
         return;
       }
       
+      // THIS FETCHES ALL THE DATA FROM SUPABASE (CURRENTLY ONLY LONGITUDE AND LATITUDE)
       const fetchData = async () => {
         const { data, error } = await supabase
         .from("LA County FY Orgs")
-        .select();
+        .select("LongitudeAndLatitude");
         //console.log("supabase", supabase)
-        console.log("inside fetchData", data, error);
         
         if (error) {
           setError("couldnt fetch data from supabase");
@@ -88,6 +88,18 @@ Marker
   
   let text = "Waiting...";
   text = JSON.stringify(location);
+
+  // Because Supabase only gives us the LongitudeAndLatitude as an array, we need to format it to match the markers format
+  // so we include latitudeDelta and longitudeDelta, and a name for each marker.
+  const formatMarkers = (longAndLat) => {
+  return longAndLat.map((item, index) => ({
+    latitude: item.LongitudeAndLatitude[1], 
+    longitude: item.LongitudeAndLatitude[0], 
+    latitudeDelta: 0.01,
+    longitudeDelta: 0.01,
+    name: `Location ${index + 1}`,  // Replace this with your actual names if available
+  }));
+};
   
   return (
     <View style={[styles.container, { marginBottom: tabBarHeight }]}>
@@ -97,7 +109,7 @@ Marker
           showsUserLocation={true}
           showsMyLocationButton={true}
         >
-          {markers.map((marker, index) => (
+          {formatMarkers(longAndLat).map((marker, index) => ( // This SETS THE MARKERS ON THE MAP
             <Marker key={index} coordinate={marker} onPress={() => onMarkerSelected(marker)}>
               <Image
                 source={require('../../assets/snapchat/ghostheart.png')}
