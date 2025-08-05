@@ -13,6 +13,10 @@ import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 
+// for a new screen
+import { createDrawerNavigator } from "@react-navigation/drawer";
+import { createStaticNavigation, useNavigation } from "@react-navigation/native";
+
 import { createClient } from "@supabase/supabase-js";
 const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
 const supabaseKey = process.env.EXPO_PUBLIC_SUPABASE_KEY;
@@ -20,6 +24,10 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 //console.log("supabase", supabase);
 
 import * as Location from "expo-location";
+
+
+// -------------    TO DO LIST    ----------------
+// CURRENTLY BEING ABLE TO TAP ONTO MARKERS TO DISPLAY DATA IS NOT WORKING AND INDVIDUAL MARKER PICTURES NEEDS TO BE ADDED
 
 import Ionicons from "react-native-vector-icons/Ionicons";
 
@@ -34,6 +42,8 @@ export default function MapScreen({ navigation }) {
   const [ longAndLat , setlongAndLat ] = useState([]);
   const [ fetchError, setError] = useState(null);
 
+  const SANTAMONICALONGITUDE = -118.4503864; // Santa Monica Longitude
+  const SANTAMONICALATITUDE = 34.0211573; // Santa
 
 Marker
   const [currentRegion, setCurrentRegion] = useState({
@@ -56,12 +66,12 @@ Marker
         return;
       }
       
-      // THIS FETCHES ALL THE DATA FROM SUPABASE (CURRENTLY ONLY LONGITUDE AND LATITUDE)
+      // THIS FETCHES ALL THE DATA FROM SUPABASE (CURRENTLY ONLY LONGITUDE AND LATITUDE / NAME)
       const fetchData = async () => {
         const { data, error } = await supabase
         .from("LA County FY Orgs")
-        .select("LongitudeAndLatitude");
-        //console.log("supabase", supabase)
+        .select("LongitudeAndLatitude, name");
+        console.log("Data", data)
         
         if (error) {
           setError("couldnt fetch data from supabase");
@@ -76,8 +86,8 @@ Marker
       let location = await Location.getCurrentPositionAsync({});
       setLocation(location);
       setCurrentRegion({
-        latitude: 34.0211573, //location.coords.latitude, (hardcoded for santa Moncia)
-        longitude: -118.4503864, //location.coords.longitude,
+        latitude: SANTAMONICALATITUDE, //location.coords.latitude, (hardcoded for santa Moncia)
+        longitude: SANTAMONICALONGITUDE, //location.coords.longitude,
         latitudeDelta: 0.0922,
         longitudeDelta: 0.0421,
       });
@@ -92,14 +102,16 @@ Marker
   // Because Supabase only gives us the LongitudeAndLatitude as an array, we need to format it to match the markers format
   // so we include latitudeDelta and longitudeDelta, and a name for each marker.
   const formatMarkers = (longAndLat) => {
-  return longAndLat.map((item, index) => ({
+  return longAndLat.map((item) => ({
     latitude: item.LongitudeAndLatitude[1], 
     longitude: item.LongitudeAndLatitude[0], 
     latitudeDelta: 0.01,
     longitudeDelta: 0.01,
-    name: `Location ${index + 1}`,  // Replace this with your actual names if available
+    name: item.name,  
   }));
 };
+
+
   
   return (
     <View style={[styles.container, { marginBottom: tabBarHeight }]}>
@@ -109,8 +121,9 @@ Marker
           showsUserLocation={true}
           showsMyLocationButton={true}
         >
-          {formatMarkers(longAndLat).map((marker, index) => ( // This SETS THE MARKERS ON THE MAP
-            <Marker key={index} coordinate={marker} onPress={() => onMarkerSelected(marker)}>
+          {formatMarkers(longAndLat).map((marker, index) => ( // This SETS THE MARKERS ON THE MAP 
+            <Marker key={index} coordinate={marker} onPress={() => console.log("MARKER PRESSED AND NEEDS TO NAVIGATE TO A NEW SCREEN (TBD): ", marker.name)} // need to pull from 
+            > 
               <Image
                 source={require('../../assets/snapchat/ghostheart.png')}
                 style={styles.markerImg}
