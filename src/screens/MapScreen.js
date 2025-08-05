@@ -13,7 +13,7 @@ import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 
-// for a new screen
+// for a new screen ( distrciptive screen when you click on a marker)
 import { createDrawerNavigator } from "@react-navigation/drawer";
 import { createStaticNavigation, useNavigation } from "@react-navigation/native";
 
@@ -53,11 +53,11 @@ Marker
     longitudeDelta: 0.0421,
   });
 
-  
+  //
   
  
   
-  
+  // GIVE WHOLE DISCRITION
   useEffect(() => {
     (async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
@@ -111,7 +111,7 @@ Marker
   }));
 };
 
-
+// Handler 
   
   return (
     <View style={[styles.container, { marginBottom: tabBarHeight }]}>
