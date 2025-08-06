@@ -65,6 +65,20 @@ export default function ProfileScreen() {
         title="Go to Nonprofit Community"
         color="#007AFF"
       />
+      <Button
+        onPress={() => {
+          navigation.navigate("MasterNonProfit");
+        }}
+        title="Go to Master Community"
+        color="#007AFF"
+      />
+      <Button
+        onPress={() => {
+          navigation.navigate("TestScreen");
+        }}
+        title="Go to Test Screen"
+        color="#007AFF"
+      />
       <Button onPress={handleSignOut} title="Log Out" />
       <Pressable>
         <Button

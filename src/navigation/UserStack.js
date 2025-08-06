@@ -11,7 +11,9 @@ import FriendStory from "../screens/FriendStory";
 import AstrologyScreen from "../screens/AstrologyScreen";
 import MemoryScreen from "../screens/MemoryScreen";
 import EventScreen from "../screens/EventScreen"; //New component by Sona and Christian
-import NonProfitCommunityScreen from "../screens/NonProfitCommunityScreen"
+import NonProfitCommunityScreen from "../screens/NonProfitCommunityScreen" // New Component by Alejandro
+import MasterNonProfitScreen from "../screens/MasterNonProfitScreen" // New component by Elijah sayres
+import TestScreen from "../screens/TestScreen" // New component by Elijah sayres
 
 const Stack = createStackNavigator();
 
@@ -71,8 +73,18 @@ export default function App() {
           options={{ headerShown: true }}
         />
         <Stack.Screen
+          name="MasterNonProfit"
+          component={MasterNonProfitScreen}
+          options={{ headerShown: true }}
+        />
+        <Stack.Screen
           name="NonProfitCommunity"
           component={NonProfitCommunityScreen}
+          options={{ headerShown: true }}
+        />
+        <Stack.Screen
+          name="TestScreen"
+          component={TestScreen}
           options={{ headerShown: true }}
         />
         
