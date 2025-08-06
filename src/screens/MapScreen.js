@@ -11,6 +11,7 @@ import {
 } from "react-native";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import BottomDrawer from "../components/BottomDrawer";
 
 
 // for a new screen
@@ -43,7 +44,10 @@ export default function MapScreen({ navigation }) {
   const [ fetchError, setError] = useState(null);
 
   const SANTAMONICALONGITUDE = -118.4503864; // Santa Monica Longitude
-  const SANTAMONICALATITUDE = 34.0211573; // Santa
+  const SANTAMONICALATITUDE = 34.0211573; // Santa Monica Latitude
+
+  const [drawerVisible, setDrawerVisible] = useState(false);
+  const [selectedPantry, setSelectedPantry] = useState(null);
 
 Marker
   const [currentRegion, setCurrentRegion] = useState({
@@ -54,10 +58,39 @@ Marker
   });
 
   
-  
+  // Calculates a really rough but good enough distance between two coordinates in miles
+  function haversineDistance(lat1Deg, lon1Deg, lat2Deg, lon2Deg) {
+    function toRad(degree) {
+        return degree * Math.PI / 180;
+    }
+    
+    const lat1 = toRad(lat1Deg);
+    const lon1 = toRad(lon1Deg);
+    const lat2 = toRad(lat2Deg);
+    const lon2 = toRad(lon2Deg);
+    
+    const { sin, cos, sqrt, atan2 } = Math;
+    
+    const R = 6371; // earth radius in km 
+    const dLat = lat2 - lat1;
+    const dLon = lon2 - lon1;
+    const a = sin(dLat / 2) * sin(dLat / 2)
+            + cos(lat1) * cos(lat2)
+            * sin(dLon / 2) * sin(dLon / 2);
+    const c = 2 * atan2(sqrt(a), sqrt(1 - a)); 
+    const d = R * c;
+    return (d/1.609); // converts km to miles
+  }
+  console.log("Distance from LA non-Profit to Santa Monica: ", haversineDistance(34.046454, -118.385107, SANTAMONICALATITUDE, SANTAMONICALONGITUDE), " miles");
  
   
+function hideButtons(){
+  //console.log("MARKER PRESSED AND NEEDS TO NAVIGATE TO A NEW SCREEN (TBD): ", marker.name)
+  console.log("HIDE BUTTONS CALLED, drawerCall: ", !(drawerVisible));
   
+}
+
+
   useEffect(() => {
     (async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
@@ -122,7 +155,7 @@ Marker
           showsMyLocationButton={true}
         >
           {formatMarkers(longAndLat).map((marker, index) => ( // This SETS THE MARKERS ON THE MAP 
-            <Marker key={index} coordinate={marker} onPress={() => console.log("MARKER PRESSED AND NEEDS TO NAVIGATE TO A NEW SCREEN (TBD): ", marker.name)} // need to pull from 
+            <Marker key={index} coordinate={marker} onPress={() => (setDrawerVisible(true))}  // need to pull from 
             > 
               <Image
                 source={require('../../assets/snapchat/ghostheart.png')}
@@ -130,27 +163,24 @@ Marker
               />
             </Marker>
           ))}
-          {/* <Marker coordinate={{ latitude: location.coords.latitude, longitude: location.coords.longitude }}
-          title="My Location"
-          description="This is a marker example" /> */}
         </MapView>
 
-        <View style={[styles.mapHeader]}>
-          <Pressable
-            onPress={() => {
-              navigation.navigate("GhostPins");
-            }}
-          >
-            <View style={styles.myBitmoji}>
-              <Ionicons name="heart" size={45} color="red" />
-              <View style={styles.bitmojiTextContainer}>
-                <Text style={styles.bitmojiText}>GhostPins</Text>
-              </View>
-            </View>
-          </Pressable>
-        </View>
+        
+        {/* Starter Code Stuff */}
 
         <View style={[styles.mapFooter]}>
+            <BottomDrawer
+              isVisible={drawerVisible}
+              onClose={() => (setDrawerVisible(false), hideButtons())}
+              entries={longAndLat} // or your pantry data (REMOVE IN BOTTOM DRAWER)
+              selectedPantry={selectedPantry} // REMOVE
+              setSelectedPantry={setSelectedPantry} // REMOVE
+            />
+
+
+          {/* Bitmoji and Location Buttons View  ( I need these to disappear and stop functionality when Drawer is open) */} 
+          <View>{!drawerVisible &&
+            <View>
           <View style={styles.locationContainer}>
             <TouchableOpacity
               style={[styles.userLocation, styles.shadow]}
@@ -196,8 +226,10 @@ Marker
               </View>
             </View>
           </View>
+        </View>}  
+          </View> 
         </View>
-      </View>
+    </View>
   );
 }
 
