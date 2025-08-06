@@ -15,28 +15,40 @@ import {
   SafeAreaView,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
+
+// TODO: 
+// 1. need to add supabase data to this component
+// 2. need to add style to screen
+// 3. need to adjust the height of the drawer to show more data and prevent the bottom from being cut off
+// 4. need to link name to the NonProfitScreen
+// 5. (extra) would like to search by name but not needed for MVP
 
 
 const { height } = Dimensions.get("window");
 const screenWidth = Dimensions.get("window").width;
 
 const dummyGridData = [
-  { id: "1", title: "2024 Euro Travels", image: "https://picsum.photos/400/400?random=1" },
-  { id: "2", title: "Check this shot!", image: "https://picsum.photos/400/400?random=2" },
+    { id: "1", title: "2024 Euro Travels", image: "https://picsum.photos/400/400?random=1" },
+    { id: "2", title: "Check this shot!", image: "https://picsum.photos/400/400?random=2" },
 ];
 
 export default function BottomDrawer({
-  isVisible,
-  onClose,
-  entries,
-  selectedPantry,
-  setSelectedPantry,
+    isVisible,
+    onClose,
+    entries,
+    selectedPantry,
+    setSelectedPantry,
 }) {
-  // --- Animation ---
-  const translateY = useRef(new Animated.Value(height)).current;
+    // --- Animation ---
+    const translateY = useRef(new Animated.Value(height)).current;
 
-  // --- State ---
-  const [selectedCategory, setSelectedCategory] = useState(null);
+    // --- Navigation ---
+    const navigation = useNavigation();
+    
+    // --- State ---
+    const [selectedCategory, setSelectedCategory] = useState(null);
+    
   
 
   // --- Categories ---
@@ -68,6 +80,8 @@ export default function BottomDrawer({
     setSelectedCategory(category)
   };
 
+  
+
   // --- Animation Effect ---
   useEffect(() => {
     console.log("BottomDrawer isVisible:!!");
@@ -82,7 +96,8 @@ export default function BottomDrawer({
   return (
     <>
       {!selectedPantry && (
-        <TouchableWithoutFeedback onPress={onClose}>
+          <TouchableWithoutFeedback onPress={onClose}>
+            
           <View style={StyleSheet.absoluteFillObject}>
             <Animated.View
               style={[
@@ -93,7 +108,8 @@ export default function BottomDrawer({
               
 
             <SafeAreaView style={styles.safeArea}>
-      <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+      <ScrollView style={styles.container} showsVerticalScrollIndicator={false} // on scroll, move screen height up to height * 1, with animation (TODO)
+      >
         {/* Header Image with Overlay */}
         
 
@@ -106,7 +122,9 @@ export default function BottomDrawer({
             />
             <View style={styles.profileInfo}>
               <View style={styles.nameRow}>
-                <Text style={styles.name}>Better Youth</Text>
+                <Text style={styles.name} onPress={() => {
+                    navigation.navigate("NonProfitCommunity");
+                }}>Better Youth</Text>
                 <Ionicons name="checkmark-circle" size={20} color="#00D4AA" />
               </View>
               <Text style={styles.meta}>Non-Profit · 8.6 Miles · 152 Members</Text>
