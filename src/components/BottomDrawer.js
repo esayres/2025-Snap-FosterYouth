@@ -11,14 +11,13 @@ import {
   ScrollView,
   FlatList,
   Image,
-  Pressable,
   SafeAreaView,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 
 // TODO: 
-// 1. need to add supabase data to this component
+// 1. need to add supabase data to this component (done, it gets passed in as props)
 // 2. need to add style to screen
 // 3. need to adjust the height of the drawer to show more data and prevent the bottom from being cut off
 // 4. need to link name to the NonProfitScreen
@@ -36,19 +35,33 @@ const dummyGridData = [
 export default function BottomDrawer({
     isVisible,
     onClose,
-    entries,
     selectedPantry,
-    setSelectedPantry,
+    profileData,
+    indexPoint,
 }) {
     // --- Animation ---
     const translateY = useRef(new Animated.Value(height)).current;
 
     // --- Navigation ---
     const navigation = useNavigation();
+
+    // --- Data Constants ---
+    const miles = profileData[indexPoint]?.miles; // miles from Santa Monica to the Non-Profit
+    const avgTravelTime = (miles / 30) * 60; // average time in minutes to get to the Non-Profit from Santa Monica
+    const name = profileData[indexPoint]?.name; // name of the Non-Profit
+    const favorite = profileData[indexPoint]?.favorites; // favorite status of the Non-Profit
+    const members = profileData[indexPoint]?.members; // members of the Non-Profit
+    const website = profileData[indexPoint]?.website; // website of the Non-Profit
+    const description = profileData[indexPoint]?.description; // description of the Non-Profit
     
     // --- State ---
     const [selectedCategory, setSelectedCategory] = useState(null);
-    
+    if (isVisible){
+        console.log("Printing Profile Data: ", profileData[indexPoint]);
+        console.log('Index Point', indexPoint)
+        console.log("Miles: ", profileData[indexPoint].miles);
+        console.log("favorites: ", profileData[indexPoint].favorites);
+    }
   
 
   // --- Categories ---
@@ -71,27 +84,18 @@ export default function BottomDrawer({
       );
 
   // --- Handlers ---
-  const handleCardPress = (item) => {
-    setSelectedPantry(item);
-    console.log(`PantryCard clicked, Selected Pantry: ${item}`);
-  };
-  const handleFilterPress = (category) => {
-    console.log(`Selected Category: ${category}`)
-    setSelectedCategory(category)
-  };
+  
 
   
 
   // --- Animation Effect ---
   useEffect(() => {
-    console.log("BottomDrawer isVisible:!!");
     Animated.timing(translateY, {
       toValue: isVisible ? height * 0.2 : height,
       duration: 300,
       useNativeDriver: true,
     }).start();
   }, [isVisible]);
-  console.log("BottomDrawer isVisible:");
   // --- Render ---
   return (
     <>
@@ -124,10 +128,10 @@ export default function BottomDrawer({
               <View style={styles.nameRow}>
                 <Text style={styles.name} onPress={() => {
                     navigation.navigate("NonProfitCommunity");
-                }}>Better Youth</Text>
+                }}>{name}</Text>
                 <Ionicons name="checkmark-circle" size={20} color="#00D4AA" />
               </View>
-              <Text style={styles.meta}>Non-Profit · 8.6 Miles · 152 Members</Text>
+              <Text style={styles.meta}>Non-Profit · {miles} Miles · {members} Members</Text>
             </View>
           </View>
 
@@ -141,11 +145,11 @@ export default function BottomDrawer({
             
             <TouchableOpacity style={styles.joinButton}>
               <Ionicons name="heart" size={16} color="white" />
-              <Text style={styles.joinButtonText}>64</Text>
+              <Text style={styles.joinButtonText}>{favorite}</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.joinButton}>
               <Ionicons name="car" size={16} color="white" />
-              <Text style={styles.joinButtonText}>15 min</Text>
+              <Text style={styles.joinButtonText}>{avgTravelTime} min</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.joinButton}>
               <Ionicons name="arrow-forward" size={16} color="white" />

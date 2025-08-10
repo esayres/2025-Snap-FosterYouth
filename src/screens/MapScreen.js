@@ -14,10 +14,6 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import BottomDrawer from "../components/BottomDrawer";
 
 
-// for a new screen
-import { createDrawerNavigator } from "@react-navigation/drawer";
-import { createStaticNavigation, useNavigation } from "@react-navigation/native";
-
 import { createClient } from "@supabase/supabase-js";
 const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
 const supabaseKey = process.env.EXPO_PUBLIC_SUPABASE_KEY;
@@ -46,7 +42,7 @@ export default function MapScreen({ navigation }) {
   const SANTAMONICALONGITUDE = -118.4503864; // Santa Monica Longitude
   const SANTAMONICALATITUDE = 34.0211573; // Santa Monica Latitude
 
-  const [drawerVisible, setDrawerVisible] = useState(false);
+  const [drawerVisible, setDrawerVisible] = useState([false, 0]); // [drawerVisible, index]
   const [selectedPantry, setSelectedPantry] = useState(null);
 
 Marker
@@ -79,9 +75,9 @@ Marker
             * sin(dLon / 2) * sin(dLon / 2);
     const c = 2 * atan2(sqrt(a), sqrt(1 - a)); 
     const d = R * c;
-    return (d/1.609); // converts km to miles
+    return Math.round((d/1.609)); // converts km to miles
   }
-  console.log("Distance from LA non-Profit to Santa Monica: ", haversineDistance(34.046454, -118.385107, SANTAMONICALATITUDE, SANTAMONICALONGITUDE), " miles");
+  //console.log("Distance from LA non-Profit to Santa Monica: ", haversineDistance(34.046454, -118.385107, SANTAMONICALATITUDE, SANTAMONICALONGITUDE), " miles");
  
   
 function hideButtons(){
@@ -103,8 +99,8 @@ function hideButtons(){
       const fetchData = async () => {
         const { data, error } = await supabase
         .from("LA County FY Orgs")
-        .select("LongitudeAndLatitude, name");
-        console.log("Data", data)
+        .select("*");
+        //console.log("Data", data)
         
         if (error) {
           setError("couldnt fetch data from supabase");
@@ -112,7 +108,7 @@ function hideButtons(){
         } if (data) {
           setlongAndLat(data);
           setError(null);
-          console.log("data from supabase", data);
+          // console.log("data from supabase", data);
         }
       }
 
@@ -140,6 +136,9 @@ function hideButtons(){
     longitude: item.LongitudeAndLatitude[0], 
     latitudeDelta: 0.01,
     longitudeDelta: 0.01,
+    miles: haversineDistance(item.LongitudeAndLatitude[1], item.LongitudeAndLatitude[0], SANTAMONICALATITUDE, SANTAMONICALONGITUDE),
+    favorites: item.favorites,
+    members: item.members,
     name: item.name,  
   }));
 };
@@ -155,7 +154,7 @@ function hideButtons(){
           showsMyLocationButton={true}
         >
           {formatMarkers(longAndLat).map((marker, index) => ( // This SETS THE MARKERS ON THE MAP 
-            <Marker key={index} coordinate={marker} onPress={() => (setDrawerVisible(true))}  // need to pull from 
+            <Marker key={index} coordinate={marker} onPress={() => (setDrawerVisible([true, index]))}  // need to pull from 
             > 
               <Image
                 source={require('../../assets/snapchat/ghostheart.png')}
@@ -170,16 +169,17 @@ function hideButtons(){
 
         <View style={[styles.mapFooter]}>
             <BottomDrawer
-              isVisible={drawerVisible}
-              onClose={() => (setDrawerVisible(false), hideButtons())}
+              isVisible={drawerVisible[0]}
+              onClose={() => (setDrawerVisible([false, 0]), hideButtons())}
               entries={longAndLat} // or your pantry data (REMOVE IN BOTTOM DRAWER)
               selectedPantry={selectedPantry} // REMOVE
-              setSelectedPantry={setSelectedPantry} // REMOVE
+              profileData={formatMarkers(longAndLat)} // or your profile data
+              indexPoint ={drawerVisible[1]} // index of the marker pressed
             />
 
 
           {/* Bitmoji and Location Buttons View  ( I need these to disappear and stop functionality when Drawer is open) */} 
-          <View>{!drawerVisible &&
+          <View>{!drawerVisible[0] &&
             <View>
           <View style={styles.locationContainer}>
             <TouchableOpacity
