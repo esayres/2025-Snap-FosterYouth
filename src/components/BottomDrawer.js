@@ -217,9 +217,9 @@ const collapseDrawer = () => {
           </View>
 
           <View style={styles.buttonRow}>
-            <TouchableOpacity style={styles.joinButton}>
-              <Ionicons name="add" size={16} color="white" />
-              <Text style={styles.joinButtonText}>Tag this Place</Text>
+            <TouchableOpacity style={styles.tagButton}>
+              <Ionicons name="add" size={16} color="#4a4c4cff" />
+              <Text style={styles.tagButtonText}>Tag this Place</Text>
             </TouchableOpacity>
           </View>
           <View style={styles.buttonRow}>
@@ -385,7 +385,7 @@ const styles = StyleSheet.create({
   profileSection: {
     backgroundColor: "#fff",
     paddingHorizontal: 16,
-    paddingVertical: 20,
+    paddingVertical: 5,
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
     marginTop: -16,
@@ -447,6 +447,18 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 6,
   },
+  tagButton: {
+    backgroundColor: "#fdffffff",
+    borderStyle: "solid",
+    borderWidth: 2,
+    borderColor: "#dce2e3ff",
+    paddingVertical: 5,
+    paddingHorizontal: 20,
+    borderRadius: 20,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+  },
   greyButton: {
     backgroundColor: "#dce2e3ff",
     paddingVertical: 10,
@@ -465,6 +477,11 @@ const styles = StyleSheet.create({
     color: "black",
     fontWeight: "600",
     fontSize: 14,
+  },
+  tagButtonText: {
+    color: "#4a4c4cff",
+    fontWeight: "600",
+    fontSize: 12,
   },
   description: {
     fontSize: 14,
