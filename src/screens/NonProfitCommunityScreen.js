@@ -300,7 +300,7 @@ export default function NonProfitCommunityScreen({ route }) {
   };
 
   const handleAskQuestion = () => {
-    // Navigate to question asking screen or open modal
+    // Navigate to question asking screen
     navigation.navigate('AskQuestion', { 
       communityId: communityData?.id,
       communityName: communityData?.name 
@@ -309,7 +309,7 @@ export default function NonProfitCommunityScreen({ route }) {
 
   const handleJoinGroupChat = () => {
     // Navigate to group chat
-    navigation.navigate('GroupChat', { 
+    navigation.push('GroupChat', { 
       communityId: communityData?.id,
       communityName: communityData?.name 
     });
@@ -402,7 +402,6 @@ export default function NonProfitCommunityScreen({ route }) {
           resizeMode="cover"
         >
           <View style={styles.headerOverlay}>
-            {/* Header buttons commented out as in original */}
           </View>
         </ImageBackground>
 

@@ -12,6 +12,7 @@ import AstrologyScreen from "../screens/AstrologyScreen";
 import MemoryScreen from "../screens/MemoryScreen";
 import EventScreen from "../screens/EventScreen"; //New component by Sona and Christian
 import NonProfitCommunityScreen from "../screens/NonProfitCommunityScreen"
+import GroupChatScreen from "../screens/GroupChatScreen";
 
 const Stack = createStackNavigator();
 
@@ -74,6 +75,14 @@ export default function App() {
           name="NonProfitCommunity"
           component={NonProfitCommunityScreen}
           options={{ headerShown: true }}
+        />
+        <Stack.Screen
+        name = "GroupChat"
+        component={GroupChatScreen}
+        options={{ 
+            title: 'Group Chat',
+            headerShown: false // Since we have custom header
+          }}
         />
         
       </Stack.Navigator>
