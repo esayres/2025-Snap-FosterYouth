@@ -49,6 +49,11 @@ export default function BottomDrawer({
     const panResponder = useRef(
   PanResponder.create({
     onMoveShouldSetPanResponder: (evt, gestureState) => {
+      if(isExpanded && scrollY > 0) {
+        console.log("Preventing drag while expanded and scrolled");
+        return false; // Don't allow dragging if the drawer is expanded and scrolled
+      }
+      // Allow dragging if the gesture is significant enough
       return Math.abs(gestureState.dy) > 10;
     },
     onPanResponderGrant: () => {
@@ -113,11 +118,13 @@ const collapseDrawer = () => {
     
     // --- State ---
     const [isExpanded, setIsExpanded] = useState(false);
+    const [scrollY, setScrollY] = useState(0);
     const [selectedCategory, setSelectedCategory] = useState(null);
     const panStartY = useRef(0);
 
     if (isVisible){
         console.log("Printing Profile Data: ", profileData[indexPoint]);
+        console.log("Scroll Y: ", scrollY);
         console.log('Index Point', indexPoint)
         console.log("Miles: ", profileData[indexPoint].miles);
         console.log("favorites: ", profileData[indexPoint].favorites);
@@ -168,7 +175,7 @@ const collapseDrawer = () => {
             
           <View style={StyleSheet.absoluteFillObject}>
             <Animated.View
-              {...panResponder.panHandlers}
+            {...panResponder.panHandlers}
               style={[
                 styles.drawer,
                 { transform: [{ translateY }], maxHeight: height * 0.93, minHeight: COLLAPSED_POSITION }, 
@@ -177,17 +184,22 @@ const collapseDrawer = () => {
               
 
             <SafeAreaView style={styles.safeArea}>
-      <ScrollView style={styles.container} showsVerticalScrollIndicator={false}  scrollEnabled={isExpanded}
- // on scroll, move screen height up to height * 1, with animation (TODO)
-      >
         {/* Header Image with Overlay */}
         
 
         {/* Profile Section */}
+       
         <View style={styles.profileSection}>
     <View style={{ alignItems: 'center', paddingVertical: 0 }} >
   <View style={{ width: 30, height: 6, backgroundColor: '#ccc', borderRadius: 2 }} onPress={() => {}}/>
 </View>
+        </View>
+      <ScrollView style={styles.container} showsVerticalScrollIndicator={false}  scrollEnabled={isExpanded} 
+      onScroll={(event) => {
+        setScrollY(event.nativeEvent.contentOffset.y);
+      }}
+      scrollEventThrottle={16}>
+        
           <View style={styles.profileRow}>
             <Image
               source={{ uri: "https://i.imgur.com/jg6Wx1G.jpg" }}
@@ -230,7 +242,7 @@ const collapseDrawer = () => {
         {/* Content Grid  (*/} 
         <View style={styles.gridContainer}>
           <FlatList
-            data={dummyGridData}
+            
             keyExtractor={(item) => item.id}
             numColumns={2}
             scrollEnabled={false}
@@ -243,17 +255,17 @@ const collapseDrawer = () => {
 
           <Text style={styles.description}>You May Also Like</Text>
           
-        </View>
+    
 
 
       </ScrollView>
     </SafeAreaView>
               
+            </Animated.View>
 
               
 
 
-            </Animated.View>
           </View>
         </TouchableWithoutFeedback>
       )}
