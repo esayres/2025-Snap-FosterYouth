@@ -11,9 +11,8 @@ import FriendStory from "../screens/FriendStory";
 import AstrologyScreen from "../screens/AstrologyScreen";
 import MemoryScreen from "../screens/MemoryScreen";
 import EventScreen from "../screens/EventScreen"; //New component by Sona and Christian
-import NonProfitCommunityScreen from "../screens/NonProfitCommunityScreen" // New Component by Alejandro
-import MasterNonProfitScreen from "../screens/MasterNonProfitScreen" // New component by Elijah sayres
-import TestScreen from "../screens/TestScreen" // New component by Elijah sayres
+import NonProfitCommunityScreen from "../screens/NonProfitCommunityScreen"
+import GroupChatScreen from "../screens/GroupChatScreen";
 
 const Stack = createStackNavigator();
 
@@ -83,9 +82,12 @@ export default function App() {
           options={{ headerShown: true }}
         />
         <Stack.Screen
-          name="TestScreen"
-          component={TestScreen}
-          options={{ headerShown: true }}
+        name = "GroupChat"
+        component={GroupChatScreen}
+        options={{ 
+            title: 'Group Chat',
+            headerShown: false // Since we have custom header
+          }}
         />
         
       </Stack.Navigator>
