@@ -12,9 +12,12 @@ import {
   FlatList,
   Image,
   SafeAreaView,
+  PanResponder
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
+import  HoursCard  from "./HoursCard"; // Import the HoursCard component
+import InfoCard from "./InfoCard";
 
 // TODO: 
 // 1. need to add supabase data to this component (done, it gets passed in as props)
@@ -26,6 +29,8 @@ import { useNavigation } from "@react-navigation/native";
 
 const { height } = Dimensions.get("window");
 const screenWidth = Dimensions.get("window").width;
+const COLLAPSED_POSITION = height * 0.5; // 50% screen height
+const EXPANDED_POSITION = height * 0.1; // fully expanded (top of screen)
 
 const dummyGridData = [
     { id: "1", title: "2024 Euro Travels", image: "https://picsum.photos/400/400?random=1" },
@@ -41,6 +46,58 @@ export default function BottomDrawer({
 }) {
     // --- Animation ---
     const translateY = useRef(new Animated.Value(height)).current;
+    const panResponder = useRef(
+  PanResponder.create({
+    onMoveShouldSetPanResponder: (evt, gestureState) => {
+      return Math.abs(gestureState.dy) > 10;
+    },
+    onPanResponderGrant: () => {
+      translateY.stopAnimation((value) => {
+        panStartY.current = value;
+      });
+    },
+    onPanResponderMove: (evt, gestureState) => {
+      const newTranslateY = panStartY.current + gestureState.dy;
+
+      // Clamp within bounds
+      if (newTranslateY >= 0 && newTranslateY <= height) {
+        translateY.setValue(newTranslateY);
+      }
+    },
+    onPanResponderRelease: (evt, gestureState) => {
+      if (gestureState.dy < -50) {
+        expandDrawer();
+      } else if (gestureState.dy > 50) {
+        collapseDrawer();
+      } else {
+        isExpanded ? expandDrawer() : collapseDrawer();
+      }
+    },
+  })
+).current;
+//
+
+
+const expandDrawer = () => {
+  Animated.timing(translateY, {
+    toValue: EXPANDED_POSITION,
+    duration: 300,
+    useNativeDriver: true,
+  }).start(() => {
+    setIsExpanded(true);
+  });
+};
+
+const collapseDrawer = () => {
+  Animated.timing(translateY, {
+    toValue: COLLAPSED_POSITION,
+    duration: 300,
+    useNativeDriver: true,
+  }).start(() => {
+    setIsExpanded(false);
+  });
+};
+
 
     // --- Navigation ---
     const navigation = useNavigation();
@@ -55,7 +112,10 @@ export default function BottomDrawer({
     const description = profileData[indexPoint]?.description; // description of the Non-Profit
     
     // --- State ---
+    const [isExpanded, setIsExpanded] = useState(false);
     const [selectedCategory, setSelectedCategory] = useState(null);
+    const panStartY = useRef(0);
+
     if (isVisible){
         console.log("Printing Profile Data: ", profileData[indexPoint]);
         console.log('Index Point', indexPoint)
@@ -90,35 +150,44 @@ export default function BottomDrawer({
 
   // --- Animation Effect ---
   useEffect(() => {
-    Animated.timing(translateY, {
-      toValue: isVisible ? height * 0.2 : height,
-      duration: 300,
-      useNativeDriver: true,
-    }).start();
+    if(isVisible) {
+      collapseDrawer();
+    }else{
+      Animated.timing(translateY, {
+        toValue: height,
+        duration: 300,
+        useNativeDriver: true,
+      }).start();
+    }
   }, [isVisible]);
   // --- Render ---
   return (
     <>
-      {!selectedPantry && (
+      {isVisible && (
           <TouchableWithoutFeedback onPress={onClose}>
             
           <View style={StyleSheet.absoluteFillObject}>
             <Animated.View
+              {...panResponder.panHandlers}
               style={[
                 styles.drawer,
-                { transform: [{ translateY }] },
+                { transform: [{ translateY }], maxHeight: height * 0.93, minHeight: COLLAPSED_POSITION }, 
               ]}
             >
               
 
             <SafeAreaView style={styles.safeArea}>
-      <ScrollView style={styles.container} showsVerticalScrollIndicator={false} // on scroll, move screen height up to height * 1, with animation (TODO)
+      <ScrollView style={styles.container} showsVerticalScrollIndicator={false}  scrollEnabled={isExpanded}
+ // on scroll, move screen height up to height * 1, with animation (TODO)
       >
         {/* Header Image with Overlay */}
         
 
         {/* Profile Section */}
         <View style={styles.profileSection}>
+    <View style={{ alignItems: 'center', paddingVertical: 0 }} >
+  <View style={{ width: 30, height: 6, backgroundColor: '#ccc', borderRadius: 2 }} onPress={() => {}}/>
+</View>
           <View style={styles.profileRow}>
             <Image
               source={{ uri: "https://i.imgur.com/jg6Wx1G.jpg" }}
@@ -143,19 +212,20 @@ export default function BottomDrawer({
           </View>
           <View style={styles.buttonRow}>
             
-            <TouchableOpacity style={styles.joinButton}>
-              <Ionicons name="heart" size={16} color="white" />
-              <Text style={styles.joinButtonText}>{favorite}</Text>
+            <TouchableOpacity style={styles.greyButton}>
+              <Ionicons name="heart" size={16} color="black" />
+              <Text style={styles.greyButtonText}>{favorite}</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.joinButton}>
-              <Ionicons name="car" size={16} color="white" />
-              <Text style={styles.joinButtonText}>{avgTravelTime} min</Text>
+            <TouchableOpacity style={styles.greyButton}>
+              <Ionicons name="car" size={16} color="black" />
+              <Text style={styles.greyButtonText}>{avgTravelTime} min</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.joinButton}>
               <Ionicons name="arrow-forward" size={16} color="white" />
               <Text style={styles.joinButtonText}></Text>
             </TouchableOpacity>
           </View>
+          <HoursCard />
 
         {/* Content Grid  (*/} 
         <View style={styles.gridContainer}>
@@ -169,10 +239,7 @@ export default function BottomDrawer({
             columnWrapperStyle={styles.gridRow}
           />
         </View>
-          <TouchableOpacity style={styles.askButton}>
-            <Text style={styles.askButtonText}>Open Now</Text>
-            <Ionicons name="arrow-forward" size={16} color="white" />
-          </TouchableOpacity>
+          <InfoCard />
 
           <Text style={styles.description}>You May Also Like</Text>
           
@@ -202,7 +269,6 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    height: height * 0.6,
     backgroundColor: "rgba(255, 255, 255, 1)",
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
@@ -212,6 +278,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 6,
     elevation: 10,
+    maxHeight: height * 0.93
   },
   headerContainer: {
     flexDirection: "row",
@@ -276,7 +343,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
   container: {
-    flex: 1,
+    flexGrow: 1,
     backgroundColor: "#fff",
   },
   headerImage: {
@@ -368,8 +435,22 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 6,
   },
+  greyButton: {
+    backgroundColor: "#dce2e3ff",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 20,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+  },
   joinButtonText: {
     color: "white",
+    fontWeight: "600",
+    fontSize: 14,
+  },
+  greyButtonText: {
+    color: "black",
     fontWeight: "600",
     fontSize: 14,
   },

@@ -38,6 +38,8 @@ export default function MapScreen({ navigation }) {
   // the current Supabase Data UseStates
   const [ longAndLat , setlongAndLat ] = useState([]);
   const [ fetchError, setError] = useState(null);
+  const [refreshKey, setRefreshKey] = useState(0); // This is to force a re-render when data changes (when new Marker are added)
+
 
   const SANTAMONICALONGITUDE = -118.4503864; // Santa Monica Longitude
   const SANTAMONICALATITUDE = 34.0211573; // Santa Monica Latitude
@@ -108,6 +110,7 @@ function hideButtons(){
         } if (data) {
           setlongAndLat(data);
           setError(null);
+          setRefreshKey(prev => prev + 1); // This is to force a re-render when data changes
           // console.log("data from supabase", data);
         }
       }
@@ -148,6 +151,7 @@ function hideButtons(){
   return (
     <View style={[styles.container, { marginBottom: tabBarHeight }]}>
         <MapView
+        key = {refreshKey}
           style={styles.map}
           region={currentRegion}
           showsUserLocation={true}
