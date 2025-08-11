@@ -7,6 +7,7 @@ import { useAuthentication } from "../utils/hooks/useAuthentication";
 import { useRealtimeChat } from "../hooks/use-realtime-chat";
 import { useChatScroll } from "../hooks/use-chat-scroll";
 
+// const orgName = "OrgNameTest";
 
 export default function AskQuestionScreen({ route, navigation }) {
     const { user } = useAuthentication();
@@ -15,7 +16,7 @@ export default function AskQuestionScreen({ route, navigation }) {
   
 
     const { messages, sendMessage, isConnected} = useRealtimeChat({
-        roomName: 'Have a question? We have answers.',
+        roomName: 'npchat',
         username
          
     });
@@ -36,7 +37,7 @@ export default function AskQuestionScreen({ route, navigation }) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Group Chat</Text>
+      <Text style={styles.header}>Chat with {orgName}</Text>
       <FlatList
         ref = {containerRef}
         data={messages}

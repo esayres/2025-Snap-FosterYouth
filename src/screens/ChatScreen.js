@@ -9,6 +9,9 @@ import { supabase } from "../utils/hooks/supabase"; // Import Supabase client
 import Header from "../components/Header";
 import { CHATBOTS } from "./ConversationScreen";
 
+
+const orgName = "OrgNameTest";
+
 export default function ChatScreen({ navigation }) {
   const [chats, setChats] = useState([]);
   const insets = useSafeAreaInsets();
@@ -70,30 +73,21 @@ export default function ChatScreen({ navigation }) {
       <View>
         {chats?.map((chat) => {
           return (
-            <TouchableOpacity
-              style={styles.userButton}
-              onPress={() => {
-                navigation.navigate("Conversation", {
-                  isChatbot: chat.isChatbot,
-                  chatId: chat.chatId,
-                });
-              }}
-              key={chat.chatId}
-            >
-              <Ionicons
-                style={styles.userIcon}
-                name="person-outline"
-                size={36}
-                color="lightgrey"
-              />
-              <Text style={styles.userName}> {chat.chatId} </Text>
-              <Ionicons
-                style={styles.userCamera}
-                name="camera-outline"
-                size={24}
-                color="lightgrey"
-              />
-            </TouchableOpacity>
+           <TouchableOpacity
+          style={[styles.userButton, {  }]}
+          onPress={() => navigation.navigate("AskQuestionScreen")}
+          key="nonprofit_chat"
+        >
+          <Ionicons
+            style={styles.userIcon}
+            name="people-outline"
+            size={36}
+            color="lightgrey"
+          />
+          <Text style={[styles.userName, { color: "black" }]}>
+            Chat with {orgName}
+          </Text>
+        </TouchableOpacity>
           );
         })}
       </View>

@@ -5,6 +5,7 @@ import BasicChatbot from "../chatbots/BasicChatbot";
 import { supabase } from "../utils/hooks/supabase";
 import { GiftedChat } from "react-native-gifted-chat";
 import { useAuthentication } from "../utils/hooks/useAuthentication";
+
 const CHATBOT_USER_OBJ = {
   // user you are trying to send a message to
   _id: 1,
