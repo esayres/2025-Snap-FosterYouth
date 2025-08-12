@@ -24,14 +24,6 @@ const InfoCard = () => {
       </TouchableOpacity>
 
       <TouchableOpacity style={styles.option}>
-        <Ionicons name="menu-outline" size={20} color="black" />
-        <View style={styles.optionTextContainer}>
-          <Text style={styles.optionText}>View Menu</Text>
-        </View>
-        <Ionicons name="chevron-forward" size={20} color="#333" />
-      </TouchableOpacity>
-
-      <TouchableOpacity style={styles.option}>
         <Ionicons name="logo-web" size={20} color="black" />
         <View style={styles.optionTextContainer}>
           <Text style={styles.optionText}>Visit Website</Text>
@@ -68,9 +60,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: 5,
     paddingVertical: 12, // Increased padding for better touch targets
     paddingHorizontal: 8, // Ensures space between icon/text and edges
+    paddingBottom: -12,
   },
   optionTextContainer: {
     flex: 1,

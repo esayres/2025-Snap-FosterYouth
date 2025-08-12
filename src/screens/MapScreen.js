@@ -45,7 +45,7 @@ export default function MapScreen({ navigation }) {
   const SANTAMONICALATITUDE = 34.0211573; // Santa Monica Latitude
 
   const [drawerVisible, setDrawerVisible] = useState([false, 0]); // [drawerVisible, index]
-  const [selectedPantry, setSelectedPantry] = useState(null);
+
 
 Marker
   const [currentRegion, setCurrentRegion] = useState({
@@ -143,6 +143,8 @@ function hideButtons(){
     favorites: item.favorites,
     members: item.members,
     name: item.name,  
+    id: item.id, // Assuming each item has a unique id
+    tags: item.tags || [], // Ensure tags is an array
   }));
 };
 
@@ -176,7 +178,6 @@ function hideButtons(){
               isVisible={drawerVisible[0]}
               onClose={() => (setDrawerVisible([false, 0]), hideButtons())}
               entries={longAndLat} // or your pantry data (REMOVE IN BOTTOM DRAWER)
-              selectedPantry={selectedPantry} // REMOVE
               profileData={formatMarkers(longAndLat)} // or your profile data
               indexPoint ={drawerVisible[1]} // index of the marker pressed
             />

@@ -12,13 +12,20 @@ import {
   FlatList,
   Image,
   SafeAreaView,
-  PanResponder
+  PanResponder,
+  TextInput
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import  HoursCard  from "./HoursCard"; // Import the HoursCard component
 import InfoCard from "./InfoCard";
+import CommentSection from "./CommentSection";
 
+
+import { createClient } from "@supabase/supabase-js";
+const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
+const supabaseKey = process.env.EXPO_PUBLIC_SUPABASE_KEY;
+const supabase = createClient(supabaseUrl, supabaseKey);
 // TODO: 
 // 1. need to add supabase data to this component (done, it gets passed in as props)
 // 2. need to add style to screen
@@ -29,8 +36,8 @@ import InfoCard from "./InfoCard";
 
 const { height } = Dimensions.get("window");
 const screenWidth = Dimensions.get("window").width;
-const COLLAPSED_POSITION = height * 0.5; // 50% screen height
-const EXPANDED_POSITION = height * 0.1; // fully expanded (top of screen)
+const COLLAPSED_POSITION = (height * 0.5); // 50% screen height
+const EXPANDED_POSITION = (height * 0.001); // fully expanded (top of screen)
 
 const dummyGridData = [
     { id: "1", title: "2024 Euro Travels", image: "https://picsum.photos/400/400?random=1" },
@@ -40,7 +47,6 @@ const dummyGridData = [
 export default function BottomDrawer({
     isVisible,
     onClose,
-    selectedPantry,
     profileData,
     indexPoint,
 }) {
@@ -115,12 +121,18 @@ const collapseDrawer = () => {
     const members = profileData[indexPoint]?.members; // members of the Non-Profit
     const website = profileData[indexPoint]?.website; // website of the Non-Profit
     const description = profileData[indexPoint]?.description; // description of the Non-Profit
+    const storedTags = profileData[indexPoint]?.tags || []; // tags of the Non-Profit, default to empty array if not present
     
     // --- State ---
     const [isExpanded, setIsExpanded] = useState(false);
     const [scrollY, setScrollY] = useState(0);
     const [selectedCategory, setSelectedCategory] = useState(null);
     const panStartY = useRef(0);
+    const [tags, setTags] = useState(storedTags); // store multiple tags
+    const [isAddingTag, setIsAddingTag] = useState(false);
+    const [newTag, setNewTag] = useState("");
+    const [isFavorite, setIsFavorite] = useState(false);
+
 
     if (isVisible){
         console.log("Printing Profile Data: ", profileData[indexPoint]);
@@ -128,6 +140,7 @@ const collapseDrawer = () => {
         console.log('Index Point', indexPoint)
         console.log("Miles: ", profileData[indexPoint].miles);
         console.log("favorites: ", profileData[indexPoint].favorites);
+        console.log("id: ", profileData[indexPoint].id);
     }
   
 
@@ -156,6 +169,13 @@ const collapseDrawer = () => {
   
 
   // --- Animation Effect ---
+
+  useEffect(() => {
+  setTags(profileData[indexPoint]?.tags || []);
+  setIsFavorite(false)
+  console.log("Updated tags:", profileData[indexPoint]);
+}, [profileData, indexPoint]);
+
   useEffect(() => {
     if(isVisible) {
       collapseDrawer();
@@ -167,20 +187,46 @@ const collapseDrawer = () => {
       }).start();
     }
   }, [isVisible]);
+
+
+
+  const addTag = (newTag) => {
+  if (newTag.trim() && !tags.includes(newTag.trim())) {
+    const updatedTags = [...tags, newTag.trim()];
+    setTags(updatedTags);
+
+    // Optional: persist tags to profileData or backend here
+    updateProfileTags(updatedTags);
+  }
+};
+const updateProfileTags = async (updatedTags) => {
+  try {
+    // Example: call your API or Supabase update here
+    await supabase
+      .from('LA County FY Orgs')
+      .update({ tags: updatedTags })
+      .eq('id', profileData[indexPoint].id);
+  } catch (error) {
+    console.error("Failed to update tags:", error);
+  }
+};
+
+
   // --- Render ---
   return (
     <>
       {isVisible && (
-          <TouchableWithoutFeedback onPress={onClose}>
+          <TouchableWithoutFeedback >
             
           <View style={StyleSheet.absoluteFillObject}>
             <Animated.View
-            {...panResponder.panHandlers}
               style={[
                 styles.drawer,
-                { transform: [{ translateY }], maxHeight: height * 0.93, minHeight: COLLAPSED_POSITION }, 
+                { transform: [{ translateY }], maxHeight: (height * 0.93), minHeight: COLLAPSED_POSITION }, 
               ]}
-            >
+              >
+              
+            <View  {...panResponder.panHandlers}>
               
 
             <SafeAreaView style={styles.safeArea}>
@@ -190,11 +236,14 @@ const collapseDrawer = () => {
         {/* Profile Section */}
        
         <View style={styles.profileSection}>
-    <View style={{ alignItems: 'center', paddingVertical: 0 }} >
-  <View style={{ width: 30, height: 6, backgroundColor: '#ccc', borderRadius: 2 }} onPress={() => {}}/>
+            <View style={styles.closeButtonContainer}>
+            <Ionicons name="close" size={24} color="#4a4c4cff" onPress={onClose} />
+          </View>
+    <View style={{ alignItems: 'center', paddingVertical: 0 }}  >
+  <View style={{ width: 30, height: 6, backgroundColor: '#ccc', borderRadius: 2 }}/>
 </View>
         </View>
-      <ScrollView style={styles.container} showsVerticalScrollIndicator={false}  scrollEnabled={isExpanded} 
+      <ScrollView style={styles.container} showsVerticalScrollIndicator={false}   scrollEnabled={isExpanded}
       onScroll={(event) => {
         setScrollY(event.nativeEvent.contentOffset.y);
       }}
@@ -204,11 +253,11 @@ const collapseDrawer = () => {
             <Image
               source={{ uri: "https://i.imgur.com/jg6Wx1G.jpg" }}
               style={styles.avatar}
-            />
+              />
             <View style={styles.profileInfo}>
               <View style={styles.nameRow}>
                 <Text style={styles.name} onPress={() => {
-                    navigation.navigate("NonProfitCommunity");
+                  navigation.navigate("NonProfitCommunity");
                 }}>{name}</Text>
                 <Ionicons name="checkmark-circle" size={20} color="#00D4AA" />
               </View>
@@ -217,16 +266,64 @@ const collapseDrawer = () => {
           </View>
 
           <View style={styles.buttonRow}>
-            <TouchableOpacity style={styles.tagButton}>
-              <Ionicons name="add" size={16} color="#4a4c4cff" />
-              <Text style={styles.tagButtonText}>Tag this Place</Text>
-            </TouchableOpacity>
+  <View style={styles.tagsContainer}>
+    {tags.length > 0 ? (
+      <>
+        {tags.map((tag, index) => (
+          <View key={index} style={styles.tagBubble}>
+            <Text style={styles.tagText}>{tag}</Text>
           </View>
+        ))}
+        <TouchableOpacity
+          style={styles.tagButton}
+          onPress={() => setIsAddingTag(true)}
+        >
+          <Ionicons name="add" size={16} color="#4a4c4cff" />
+        </TouchableOpacity>
+      </>
+    ) : (
+      <TouchableOpacity
+        style={styles.tagButton}
+        onPress={() => setIsAddingTag(true)}
+      >
+        <Ionicons name="add" size={16} color="#4a4c4cff" />
+        <Text style={styles.tagButtonText}>Tag this Place</Text>
+      </TouchableOpacity>
+    )}
+  </View>
+</View>
+
+{isAddingTag && (
+  <View style={styles.tagInputContainer}>
+    <TextInput
+      style={styles.tagInput}
+      placeholder="Enter tag..."
+      value={newTag}
+      onChangeText={setNewTag}
+      onSubmitEditing={() => {
+        if (newTag.trim()) {
+          addTag(newTag.trim())
+          setNewTag("");
+          setIsAddingTag(false);
+        }
+      }}
+      autoFocus={true}
+      returnKeyType="done"
+    />
+    <TouchableOpacity onPress={() => setIsAddingTag(false)} style={styles.tagInputClose}>
+      <Ionicons name="close" size={20} color="#333" />
+    </TouchableOpacity>
+  </View>
+)}
           <View style={styles.buttonRow}>
             
-            <TouchableOpacity style={styles.greyButton}>
-              <Ionicons name="heart" size={16} color="black" />
-              <Text style={styles.greyButtonText}>{favorite}</Text>
+            <TouchableOpacity
+            style={styles.greyButton}
+            onPress={() => setIsFavorite(!isFavorite)}>
+            <Ionicons name={isFavorite ? "heart" : "heart-outline"} size={16}color={isFavorite ? "red" : "black"}/>
+            <Text style={styles.greyButtonText}>
+              {isFavorite ? parseInt(favorite) + 1 : favorite}
+            </Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.greyButton}>
               <Ionicons name="car" size={16} color="black" />
@@ -240,26 +337,16 @@ const collapseDrawer = () => {
           <HoursCard />
 
         {/* Content Grid  (*/} 
-        <View style={styles.gridContainer}>
-          <FlatList
-            
-            keyExtractor={(item) => item.id}
-            numColumns={2}
-            scrollEnabled={false}
-            renderItem={renderGridItem}
-            ItemSeparatorComponent={() => <View style={styles.gridSeparator} />}
-            columnWrapperStyle={styles.gridRow}
-          />
-        </View>
+        
           <InfoCard />
-
-          <Text style={styles.description}>You May Also Like</Text>
+          <CommentSection/>
           
     
 
 
       </ScrollView>
     </SafeAreaView>
+            </View>
               
             </Animated.View>
 
@@ -285,12 +372,12 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     padding: 16,
+    paddingBottom: 0,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: -2 },
     shadowOpacity: 0.2,
     shadowRadius: 6,
     elevation: 10,
-    maxHeight: height * 0.93
   },
   headerContainer: {
     flexDirection: "row",
@@ -355,7 +442,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
   container: {
-    flexGrow: 1,
+    contentContainerStyle: { flexGrow: 1 },
     backgroundColor: "#fff",
   },
   headerImage: {
@@ -569,4 +656,45 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     fontSize: 14,
   },
+  tagsContainer: {
+  flexDirection: "row",
+  alignItems: "center",
+  gap: 8, // or use marginRight in tagBubble
+  flexWrap: "wrap",
+},
+
+tagBubble: {
+  backgroundColor: "#fdffffff",  // same as tagButton background
+  borderColor: "#dce2e3ff",
+  borderWidth: 2,
+  borderRadius: 20,
+  paddingVertical: 5,
+  paddingHorizontal: 20,
+  justifyContent: "center",
+  alignItems: "center",
+  // no pointer events, so not pressable
+},
+
+tagText: {
+  color: "#4a4c4cff",
+  fontWeight: "600",
+  fontSize: 12,
+},
+
+tagButton: {
+  backgroundColor: "#fdffffff",
+  borderColor: "#dce2e3ff",
+  borderWidth: 2,
+  paddingVertical: 5,
+  paddingHorizontal: 20,
+  borderRadius: 20,
+  flexDirection: "row",
+  alignItems: "center",
+  gap: 6,
+},closeButtonContainer: {
+  position: "absolute",
+  top: 16,
+  right: 16,
+  zIndex: 10,
+},
 });
