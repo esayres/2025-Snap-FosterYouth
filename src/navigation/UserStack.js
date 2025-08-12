@@ -77,13 +77,23 @@ export default function App() {
           options={{ headerShown: true }}
         />
         <Stack.Screen
-        name = "GroupChat"
-        component={GroupChatScreen}
-        options={{ 
-            title: 'Group Chat',
-            headerShown: false // Since we have custom header
-          }}
-        />
+  name="GroupChat"
+  component={GroupChatScreen}
+  options={({ route }) => ({
+    headerShown: true,  // Change from false to true
+    title: route.params?.communityName || 'Group Chat',
+    headerTitleStyle: {
+      fontSize: 18,
+      fontWeight: '600',
+    },
+    headerStyle: {
+      backgroundColor: '#fff',
+      borderBottomWidth: 1,
+      borderBottomColor: '#e1e8ed',
+    },
+    headerTintColor: '#007AFF',
+  })}
+/>
         
       </Stack.Navigator>
     </NavigationContainer>

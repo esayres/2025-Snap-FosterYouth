@@ -135,7 +135,7 @@ const handleSend = () => {
   return (
     <SafeAreaView style={styles.container}>
       {/* Header */}
-      <View style={styles.header}>
+      {/* <View style={styles.header}>
         <TouchableOpacity 
           style={styles.backButton}
           onPress={() => navigation.goBack()}
@@ -145,7 +145,7 @@ const handleSend = () => {
         <View style={styles.headerContent}>
           <Text style={styles.headerTitle}>{communityName}</Text>
         </View>
-      </View>
+      </View> */}
 
       <KeyboardAvoidingView 
         style={styles.chatContainer}
