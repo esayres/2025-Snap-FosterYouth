@@ -71,6 +71,7 @@ export default function App() {
           component={EventScreen}
           options={{ headerShown: true }}
         />
+        
         <Stack.Screen
           name="NonProfitCommunity"
           component={NonProfitCommunityScreen}

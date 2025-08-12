@@ -11,11 +11,8 @@ import {
 } from "react-native";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import BottomDrawer from "../components/BottomDrawer";
 
-
-// for a new screen
-import { createDrawerNavigator } from "@react-navigation/drawer";
-import { createStaticNavigation, useNavigation } from "@react-navigation/native";
 
 import { createClient } from "@supabase/supabase-js";
 const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
@@ -41,9 +38,15 @@ export default function MapScreen({ navigation }) {
   // the current Supabase Data UseStates
   const [ longAndLat , setlongAndLat ] = useState([]);
   const [ fetchError, setError] = useState(null);
+  const [refreshKey, setRefreshKey] = useState(0); // This is to force a re-render when data changes (when new Marker are added)
+
 
   const SANTAMONICALONGITUDE = -118.4503864; // Santa Monica Longitude
-  const SANTAMONICALATITUDE = 34.0211573; // Santa
+  const SANTAMONICALATITUDE = 34.0211573; // Santa Monica Latitude
+
+  const [drawerVisible, setDrawerVisible] = useState([false, 0]); // [drawerVisible, index]
+   const [isSnapCaresMode, setIsSnapCaresMode] = useState(false);
+
 
 Marker
   const [currentRegion, setCurrentRegion] = useState({
@@ -54,10 +57,39 @@ Marker
   });
 
   
-  
+  // Calculates a really rough but good enough distance between two coordinates in miles
+  function haversineDistance(lat1Deg, lon1Deg, lat2Deg, lon2Deg) {
+    function toRad(degree) {
+        return degree * Math.PI / 180;
+    }
+    
+    const lat1 = toRad(lat1Deg);
+    const lon1 = toRad(lon1Deg);
+    const lat2 = toRad(lat2Deg);
+    const lon2 = toRad(lon2Deg);
+    
+    const { sin, cos, sqrt, atan2 } = Math;
+    
+    const R = 6371; // earth radius in km 
+    const dLat = lat2 - lat1;
+    const dLon = lon2 - lon1;
+    const a = sin(dLat / 2) * sin(dLat / 2)
+            + cos(lat1) * cos(lat2)
+            * sin(dLon / 2) * sin(dLon / 2);
+    const c = 2 * atan2(sqrt(a), sqrt(1 - a)); 
+    const d = R * c;
+    return Math.round((d/1.609)); // converts km to miles
+  }
+  //console.log("Distance from LA non-Profit to Santa Monica: ", haversineDistance(34.046454, -118.385107, SANTAMONICALATITUDE, SANTAMONICALONGITUDE), " miles");
  
   
+function hideButtons(){
+  //console.log("MARKER PRESSED AND NEEDS TO NAVIGATE TO A NEW SCREEN (TBD): ", marker.name)
+  console.log("HIDE BUTTONS CALLED, drawerCall: ", !(drawerVisible));
   
+}
+
+
   useEffect(() => {
     (async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
@@ -70,8 +102,8 @@ Marker
       const fetchData = async () => {
         const { data, error } = await supabase
         .from("LA County FY Orgs")
-        .select("LongitudeAndLatitude, name");
-        console.log("Data", data)
+        .select("*");
+        //console.log("Data", data)
         
         if (error) {
           setError("couldnt fetch data from supabase");
@@ -79,7 +111,8 @@ Marker
         } if (data) {
           setlongAndLat(data);
           setError(null);
-          console.log("data from supabase", data);
+          setRefreshKey(prev => prev + 1); // This is to force a re-render when data changes
+          // console.log("data from supabase", data);
         }
       }
 
@@ -107,7 +140,15 @@ Marker
     longitude: item.LongitudeAndLatitude[0], 
     latitudeDelta: 0.01,
     longitudeDelta: 0.01,
+    miles: haversineDistance(item.LongitudeAndLatitude[1], item.LongitudeAndLatitude[0], SANTAMONICALATITUDE, SANTAMONICALONGITUDE),
+    favorites: item.favorites,
+    members: item.members,
     name: item.name,  
+    id: item.id, // Assuming each item has a unique id
+    tags: item.tags || [], // Ensure tags is an array
+    website: item.website, // website of the Non-Profit
+    address: item.address, // address of the Non-Profit
+    phoneNumber: item.contact, // phone number of the Non-Profit
   }));
 };
 
@@ -116,13 +157,14 @@ Marker
   return (
     <View style={[styles.container, { marginBottom: tabBarHeight }]}>
         <MapView
+        key = {refreshKey}
           style={styles.map}
           region={currentRegion}
           showsUserLocation={true}
           showsMyLocationButton={true}
         >
-          {formatMarkers(longAndLat).map((marker, index) => ( // This SETS THE MARKERS ON THE MAP 
-            <Marker key={index} coordinate={marker} onPress={() => console.log("MARKER PRESSED AND NEEDS TO NAVIGATE TO A NEW SCREEN (TBD): ", marker.name)} // need to pull from 
+          {isSnapCaresMode && formatMarkers(longAndLat).map((marker, index) => ( // This SETS THE MARKERS ON THE MAP 
+            <Marker key={index} coordinate={marker} onPress={() => (setDrawerVisible([true, index]))}  // need to pull from 
             > 
               <Image
                 source={require('../../assets/snapchat/ghostheart.png')}
@@ -130,28 +172,35 @@ Marker
               />
             </Marker>
           ))}
-          {/* <Marker coordinate={{ latitude: location.coords.latitude, longitude: location.coords.longitude }}
-          title="My Location"
-          description="This is a marker example" /> */}
         </MapView>
 
-        <View style={[styles.mapHeader]}>
-          <Pressable
-            onPress={() => {
-              navigation.navigate("GhostPins");
-            }}
-          >
-            <View style={styles.myBitmoji}>
-              <Ionicons name="heart" size={45} color="red" />
-              <View style={styles.bitmojiTextContainer}>
-                <Text style={styles.bitmojiText}>GhostPins</Text>
-              </View>
-            </View>
-          </Pressable>
-        </View>
+        
+        {/* Starter Code Stuff */}
 
         <View style={[styles.mapFooter]}>
+            <BottomDrawer
+              isVisible={drawerVisible[0]}
+              onClose={() => (setDrawerVisible([false, 0]), hideButtons())}
+              entries={longAndLat} // or your pantry data (REMOVE IN BOTTOM DRAWER)
+              profileData={formatMarkers(longAndLat)} // or your profile data
+              indexPoint ={drawerVisible[1]} // index of the marker pressed
+            />
+
+
+          {/* Bitmoji and Location Buttons View  ( I need these to disappear and stop functionality when Drawer is open) */} 
+          <View>{!drawerVisible[0] &&
+            <View>
+          <View>
+            
           <View style={styles.locationContainer}>
+            <TouchableOpacity
+              style={[styles.userLocation, styles.shadow]}
+              onPress={() => {setIsSnapCaresMode(!isSnapCaresMode)
+                console.log("SnapCares Mode On!");
+              }}
+            >
+              <Ionicons name={isSnapCaresMode ? "heart" : "heart-outline"} size={25} color="green" />
+            </TouchableOpacity>
             <TouchableOpacity
               style={[styles.userLocation, styles.shadow]}
               onPress={() => {
@@ -162,6 +211,7 @@ Marker
             >
               <Ionicons name="navigate" size={15} color="black" />
             </TouchableOpacity>
+          </View>
           </View>
           <View style={[styles.bitmojiContainer, styles.shadow]}>
             <Pressable
@@ -196,8 +246,10 @@ Marker
               </View>
             </View>
           </View>
+        </View>}  
+          </View> 
         </View>
-      </View>
+    </View>
   );
 }
 
@@ -230,6 +282,9 @@ const styles = StyleSheet.create({
     backgroundColor: "transparent",
     width: "100%",
     paddingBottom: 8,
+    marginLeft: 40,
+    flexDirection: "row",
+    gap: "29%",
     alignItems: "center",
   },
   userLocation: {

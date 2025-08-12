@@ -147,7 +147,7 @@ const styles = StyleSheet.create({
   grayRectangle: {
     flexDirection: "row",
     justifyContent: "space-around",
-    backgroundColor: colors.belowPage,
+    backgroundColor: "white",// colors.belowPage
     borderRadius: 100,
     height: 48,
   },
