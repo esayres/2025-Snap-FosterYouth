@@ -233,22 +233,23 @@ const updateProfileTags = async (updatedTags) => {
 
   // --- Render ---
   return (
-    <>
-      {isVisible && (
-          <TouchableWithoutFeedback >
+    < >
+      {isVisible && ( 
+          <TouchableWithoutFeedback>
             
           <View style={StyleSheet.absoluteFillObject}>
-            <Animated.View
+            <Animated.View {...panResponder.panHandlers}
+            
               style={[
                 styles.drawer,
-                { transform: [{ translateY }], maxHeight: (height * 0.93), minHeight: COLLAPSED_POSITION }, 
+                { transform: [{ translateY }], maxHeight: (height * 0.93), minHeight: COLLAPSED_POSITION, }, 
               ]}
               >
               
-            <View  {...panResponder.panHandlers}>
+            <View >
               
 
-            <SafeAreaView style={styles.safeArea}>
+            <SafeAreaView style={styles.safeArea}> 
         {/* Header Image with Overlay */}
         
 
@@ -259,10 +260,10 @@ const updateProfileTags = async (updatedTags) => {
             <Ionicons name="close" size={24} color="#4a4c4cff" onPress={onClose} />
           </View>
     <View style={{ alignItems: 'center', paddingVertical: 0 }}  >
-  <View style={{ width: 30, height: 6, backgroundColor: '#ccc', borderRadius: 2 }}/>
+  <View style={{ width: 30, height: 6, backgroundColor: '#ccc', borderRadius: 2 }} />
 </View>
         </View>
-      <ScrollView style={styles.container} showsVerticalScrollIndicator={false}   scrollEnabled={isExpanded}
+      <ScrollView style={styles.container} showsVerticalScrollIndicator={false}   scrollEnabled={isExpanded} 
       onScroll={(event) => {
         setScrollY(event.nativeEvent.contentOffset.y);
       }}
