@@ -80,10 +80,10 @@ export default function App() {
   name="GroupChat"
   component={GroupChatScreen}
   options={({ route }) => ({
-    headerShown: true,  // Change from false to true
+    headerShown: true, 
     title: route.params?.communityName || 'Group Chat',
     headerTitleStyle: {
-      fontSize: 18,
+      fontSize: 26,
       fontWeight: '600',
     },
     headerStyle: {
@@ -91,7 +91,7 @@ export default function App() {
       borderBottomWidth: 1,
       borderBottomColor: '#e1e8ed',
     },
-    headerTintColor: '#007AFF',
+    headerTintColor: '#000000ff',
   })}
 />
         

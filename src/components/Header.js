@@ -20,7 +20,7 @@ export default function Header({ title }) {
   const navigation = useNavigation();
 
   const [profilePicUrl, setProfilePicUrl] = useState(
-    "https://i.imgur.com/FxsJ3xy.jpg",
+    "https://i.imgur.com/NeWYyLe.png",
   );
 
   const { user } = useAuthentication();
