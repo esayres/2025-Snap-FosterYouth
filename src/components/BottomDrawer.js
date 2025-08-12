@@ -13,7 +13,9 @@ import {
   Image,
   SafeAreaView,
   PanResponder,
-  TextInput
+  TextInput,
+  Linking,
+  Alert 
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
@@ -112,6 +114,18 @@ const collapseDrawer = () => {
 
     // --- Navigation ---
     const navigation = useNavigation();
+    // Navigates to a website
+    const openWebsite = (url) => {
+      Alert.alert('Leave App?', 'Are you sure you want to find directions to this location?',[{
+            text: 'Cancel',
+            style: 'cancel',
+          },{
+            text: 'Yes',
+            onPress: () => {
+              Linking.openURL(url).catch(err =>
+                console.error('Failed to open URL:', err)
+              );
+            },},],{ cancelable: true });};
 
     // --- Data Constants ---
     const miles = profileData[indexPoint]?.miles; // miles from Santa Monica to the Non-Profit
@@ -121,6 +135,8 @@ const collapseDrawer = () => {
     const members = profileData[indexPoint]?.members; // members of the Non-Profit
     const website = profileData[indexPoint]?.website; // website of the Non-Profit
     const description = profileData[indexPoint]?.description; // description of the Non-Profit
+    const address = profileData[indexPoint]?.address; // address of the Non-Profit
+    const phoneNumber = profileData[indexPoint]?.phoneNumber; // phone number of the Non-Profit
     const storedTags = profileData[indexPoint]?.tags || []; // tags of the Non-Profit, default to empty array if not present
     
     // --- State ---
@@ -136,11 +152,14 @@ const collapseDrawer = () => {
 
     if (isVisible){
         console.log("Printing Profile Data: ", profileData[indexPoint]);
-        console.log("Scroll Y: ", scrollY);
-        console.log('Index Point', indexPoint)
-        console.log("Miles: ", profileData[indexPoint].miles);
-        console.log("favorites: ", profileData[indexPoint].favorites);
-        console.log("id: ", profileData[indexPoint].id);
+        //console.log("Scroll Y: ", scrollY);
+       // console.log('Index Point', indexPoint)
+        //console.log("Miles: ", profileData[indexPoint].miles);
+        //console.log("favorites: ", profileData[indexPoint].favorites);
+        //console.log("id: ", profileData[indexPoint].id);
+        console.log("website: ", profileData[indexPoint].website);
+        console.log("address: ", profileData[indexPoint].address);
+        console.log("phoneNumber: ", profileData[indexPoint].phoneNumber);
     }
   
 
@@ -320,17 +339,17 @@ const updateProfileTags = async (updatedTags) => {
             <TouchableOpacity
             style={styles.greyButton}
             onPress={() => setIsFavorite(!isFavorite)}>
-            <Ionicons name={isFavorite ? "heart" : "heart-outline"} size={16}color={isFavorite ? "red" : "black"}/>
+            <Ionicons name={isFavorite ? "heart" : "heart-outline"} size={24} color={isFavorite ? "red" : "black"}/>
             <Text style={styles.greyButtonText}>
               {isFavorite ? parseInt(favorite) + 1 : favorite}
             </Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.greyButton}>
-              <Ionicons name="car" size={16} color="black" />
+            <TouchableOpacity style={styles.greyButton} onPress={() => openWebsite("https://www.google.com/maps/dir//" + address)}>
+              <Ionicons name="car" size={24} color="black" />
               <Text style={styles.greyButtonText}>{avgTravelTime} min</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.joinButton}>
-              <Ionicons name="arrow-forward" size={16} color="white" />
+              <Ionicons name="arrow-redo-sharp" size={24} color="white" />
               <Text style={styles.joinButtonText}></Text>
             </TouchableOpacity>
           </View>
@@ -338,7 +357,7 @@ const updateProfileTags = async (updatedTags) => {
 
         {/* Content Grid  (*/} 
         
-          <InfoCard />
+          <InfoCard address={address} websiteURL={website} phoneNumber={phoneNumber}/>
           <CommentSection/>
           
     
@@ -508,6 +527,7 @@ const styles = StyleSheet.create({
   },
   buttonRow: {
     flexDirection: "row",
+    justifyContent: "space-between",
     gap: 12,
     marginBottom: 16,
   },
@@ -526,12 +546,14 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   joinButton: {
+    flex: 1,
     backgroundColor: "#00BFFF",
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 20,
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "center",
     gap: 6,
   },
   tagButton: {
@@ -547,12 +569,14 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   greyButton: {
+    flex: 1,
     backgroundColor: "#dce2e3ff",
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 20,
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "center",
     gap: 6,
   },
   joinButtonText: {

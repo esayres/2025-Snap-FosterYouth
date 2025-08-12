@@ -1,32 +1,55 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Linking, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons'; // or use any icon set
 
-const InfoCard = () => {
+const InfoCard = ( {address, websiteURL, phoneNumber}) => {
+    // A function that asks if you want to go to website then if yes, opens the website
+    const openWebsite = (url) => {
+  Alert.alert('Leave App?', 'Are you sure you want to visit this website?',[{
+        text: 'Cancel',
+        style: 'cancel',
+      },{
+        text: 'Yes',
+        onPress: () => {
+          Linking.openURL(url).catch(err =>
+            console.error('Failed to open URL:', err)
+          );
+        },},],{ cancelable: true });};
+
+    // A function that asks if you want to call then if yes, opens the phone dialer
+
+const confirmAndCall = (phoneNumber) => {
+  Alert.alert('Call this number?', `Would you like to call ${phoneNumber}?`,[{
+        text: 'Cancel',
+        style: 'cancel',
+      },{
+        text: 'Call',},],{ cancelable: true });};
+
   return (
     <View style={styles.card}>
-      <TouchableOpacity style={styles.option}>
+      <TouchableOpacity style={styles.option} onPress={() => openWebsite("https://www.google.com/maps/place/" + address)}>
         <Ionicons name="location-outline" size={20} color="black" />
         <View style={styles.optionTextContainer}>
           <Text style={styles.optionText}>Address</Text>
-          <Text style={styles.optionSubText}>1234 Some St, City, State, 12345</Text>
+          <Text style={styles.optionSubText}>{address}</Text>
         </View>
         <Ionicons name="chevron-forward" size={20} color="#333" />
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.option}>
+      <TouchableOpacity style={styles.option} onPress={() => confirmAndCall(phoneNumber)}>
         <Ionicons name="call-outline" size={20} color="black" />
         <View style={styles.optionTextContainer}>
           <Text style={styles.optionText}>Call</Text>
-          <Text style={styles.optionSubText}>(123) 456-7890</Text>
+          <Text style={styles.optionSubText}>{phoneNumber}</Text>
         </View>
         <Ionicons name="chevron-forward" size={20} color="#333" />
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.option}>
+      <TouchableOpacity style={styles.option} onPress={() => openWebsite(websiteURL)}>
         <Ionicons name="logo-web" size={20} color="black" />
         <View style={styles.optionTextContainer}>
           <Text style={styles.optionText}>Visit Website</Text>
+          <Text style={styles.optionSubText}>{websiteURL}</Text>
         </View>
         <Ionicons name="chevron-forward" size={20} color="#333" />
       </TouchableOpacity>

@@ -145,6 +145,9 @@ function hideButtons(){
     name: item.name,  
     id: item.id, // Assuming each item has a unique id
     tags: item.tags || [], // Ensure tags is an array
+    website: item.website, // website of the Non-Profit
+    address: item.address, // address of the Non-Profit
+    phoneNumber: item.contact, // phone number of the Non-Profit
   }));
 };
 
