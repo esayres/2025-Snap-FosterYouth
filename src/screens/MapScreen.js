@@ -45,6 +45,7 @@ export default function MapScreen({ navigation }) {
   const SANTAMONICALATITUDE = 34.0211573; // Santa Monica Latitude
 
   const [drawerVisible, setDrawerVisible] = useState([false, 0]); // [drawerVisible, index]
+   const [isSnapCaresMode, setIsSnapCaresMode] = useState(false);
 
 
 Marker
@@ -162,7 +163,7 @@ function hideButtons(){
           showsUserLocation={true}
           showsMyLocationButton={true}
         >
-          {formatMarkers(longAndLat).map((marker, index) => ( // This SETS THE MARKERS ON THE MAP 
+          {isSnapCaresMode && formatMarkers(longAndLat).map((marker, index) => ( // This SETS THE MARKERS ON THE MAP 
             <Marker key={index} coordinate={marker} onPress={() => (setDrawerVisible([true, index]))}  // need to pull from 
             > 
               <Image
@@ -189,7 +190,17 @@ function hideButtons(){
           {/* Bitmoji and Location Buttons View  ( I need these to disappear and stop functionality when Drawer is open) */} 
           <View>{!drawerVisible[0] &&
             <View>
+          <View>
+            
           <View style={styles.locationContainer}>
+            <TouchableOpacity
+              style={[styles.userLocation, styles.shadow]}
+              onPress={() => {setIsSnapCaresMode(!isSnapCaresMode)
+                console.log("SnapCares Mode On!");
+              }}
+            >
+              <Ionicons name={isSnapCaresMode ? "heart" : "heart-outline"} size={25} color="green" />
+            </TouchableOpacity>
             <TouchableOpacity
               style={[styles.userLocation, styles.shadow]}
               onPress={() => {
@@ -200,6 +211,7 @@ function hideButtons(){
             >
               <Ionicons name="navigate" size={15} color="black" />
             </TouchableOpacity>
+          </View>
           </View>
           <View style={[styles.bitmojiContainer, styles.shadow]}>
             <Pressable
@@ -270,6 +282,9 @@ const styles = StyleSheet.create({
     backgroundColor: "transparent",
     width: "100%",
     paddingBottom: 8,
+    marginLeft: 40,
+    flexDirection: "row",
+    gap: "29%",
     alignItems: "center",
   },
   userLocation: {
