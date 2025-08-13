@@ -2,6 +2,37 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Linking, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons'; // or use any icon set
 
+const handleReport = () => {
+  Alert.prompt(
+    'Report an issue?',
+    'Would you like to report an issue?',
+    [
+      { 
+        text: 'Cancel', 
+        style: 'cancel' 
+      },
+      { 
+        text: 'Submit', 
+        onPress: (text) => {
+          if (text && text.trim()) {
+            Alert.alert(
+              'Thanks!', 
+              'Your report has been submitted!',
+              [{ text: 'OK', style: 'default' }]
+            );
+          } else {
+            Alert.alert('Error', 'Please enter a report before submitting.');
+          }
+        }
+      }
+    ],
+    'plain-text',
+    '', 
+    'default' 
+  );
+};
+
+
 const InfoCard = ( {address, websiteURL, phoneNumber}) => {
     // A function that asks if you want to go to website then if yes, opens the website
     const openWebsite = (url) => {
@@ -46,7 +77,7 @@ const confirmAndCall = (phoneNumber) => {
       </TouchableOpacity>
 
       <TouchableOpacity style={styles.option} onPress={() => openWebsite(websiteURL)}>
-        <Ionicons name="logo-web" size={20} color="black" />
+        <Ionicons name="globe" size={20} color="black" />
         <View style={styles.optionTextContainer}>
           <Text style={styles.optionText}>Visit Website</Text>
           <Text style={styles.optionSubText}>{websiteURL}</Text>
@@ -54,7 +85,7 @@ const confirmAndCall = (phoneNumber) => {
         <Ionicons name="chevron-forward" size={20} color="#333" />
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.option}>
+      <TouchableOpacity style={styles.option} onPress={()=> handleReport()}>
         <Ionicons name="alert-circle-outline" size={20} color="black" />
         <View style={styles.optionTextContainer}>
           <Text style={styles.optionText}>Report an Issue</Text>
@@ -64,6 +95,7 @@ const confirmAndCall = (phoneNumber) => {
     </View>
   );
 };
+
 
 const styles = StyleSheet.create({
   card: {

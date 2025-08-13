@@ -13,6 +13,7 @@ import MemoryScreen from "../screens/MemoryScreen";
 import EventScreen from "../screens/EventScreen"; //New component by Sona and Christian
 import NonProfitCommunityScreen from "../screens/NonProfitCommunityScreen"
 import GroupChatScreen from "../screens/GroupChatScreen";
+import ChatScreen from "../screens/ChatScreen"
 
 const Stack = createStackNavigator();
 

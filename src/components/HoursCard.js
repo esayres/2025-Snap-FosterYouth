@@ -5,7 +5,7 @@ import { Ionicons } from '@expo/vector-icons'; // or use any icon set
 
 
 const HoursCard = () => {
-    console.log("Rendering HoursCard component"); // Debugging log
+    //console.log("Rendering HoursCard component"); // Debugging log
   const [expanded, setExpanded] = useState(false);
 
   const toggleExpanded = () => {

@@ -58,7 +58,7 @@ export default function BottomDrawer({
   PanResponder.create({
     onMoveShouldSetPanResponder: (evt, gestureState) => {
       if(isExpanded && scrollY > 0) {
-        console.log("Preventing drag while expanded and scrolled");
+        //console.log("Preventing drag while expanded and scrolled");
         return false; // Don't allow dragging if the drawer is expanded and scrolled
       }
       // Allow dragging if the gesture is significant enough
@@ -152,17 +152,17 @@ const collapseDrawer = () => {
     const [isFavorite, setIsFavorite] = useState(false);
 
 
-    if (isVisible){
-        console.log("Printing Profile Data: ", profileData[indexPoint]);
-        //console.log("Scroll Y: ", scrollY);
-       // console.log('Index Point', indexPoint)
-        //console.log("Miles: ", profileData[indexPoint].miles);
-        //console.log("favorites: ", profileData[indexPoint].favorites);
-        //console.log("id: ", profileData[indexPoint].id);
-        console.log("website: ", profileData[indexPoint].website);
-        console.log("address: ", profileData[indexPoint].address);
-        console.log("phoneNumber: ", profileData[indexPoint].phoneNumber);
-    }
+    // if (isVisible){
+    //     console.log("Printing Profile Data: ", profileData[indexPoint]);
+    //     //console.log("Scroll Y: ", scrollY);
+    //    // console.log('Index Point', indexPoint)
+    //     //console.log("Miles: ", profileData[indexPoint].miles);
+    //     //console.log("favorites: ", profileData[indexPoint].favorites);
+    //     //console.log("id: ", profileData[indexPoint].id);
+    //     console.log("website: ", profileData[indexPoint].website);
+    //     console.log("address: ", profileData[indexPoint].address);
+    //     console.log("phoneNumber: ", profileData[indexPoint].phoneNumber);
+    // }
   
 
   // --- Categories ---
@@ -194,7 +194,7 @@ const collapseDrawer = () => {
   useEffect(() => {
   setTags(profileData[indexPoint]?.tags || []);
   setIsFavorite(false)
-  console.log("Updated tags:", profileData[indexPoint]);
+  //console.log("Updated tags:", profileData[indexPoint]);
 }, [profileData, indexPoint]);
 
   useEffect(() => {
@@ -233,7 +233,7 @@ const updateProfileTags = async (updatedTags) => {
 };
 
 const fetchUserById = async (id) => {
-  console.log("THIS IS ID NUMBER: ", id)
+  //console.log("THIS IS ID NUMBER: ", id)
   const { data, error } = await supabase
     .from('communities')           // replace with your actual table name
     .select('*')             // or just the fields you need
@@ -369,7 +369,9 @@ const fetchUserById = async (id) => {
               <Ionicons name="car" size={24} color="black" />
               <Text style={styles.greyButtonText}>{avgTravelTime} min</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.joinButton}>
+            <TouchableOpacity style={styles.joinButton} onPress={() => {
+                  fetchUserById(profileData[indexPoint].id)
+                }}>
               <Ionicons name="arrow-redo-sharp" size={24} color="white" />
               <Text style={styles.joinButtonText}></Text>
             </TouchableOpacity>

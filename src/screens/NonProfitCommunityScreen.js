@@ -71,7 +71,7 @@ export default function NonProfitCommunityScreen({ route }) {
       const membershipData = data.community_members?.find(member => member.user_id === user.id);
       setIsMember(!!membershipData);
       
-      console.log('Single query - Membership check:', !!membershipData, 'for user:', user.id, 'community:', data.id);
+      //console.log('Single query - Membership check:', !!membershipData, 'for user:', user.id, 'community:', data.id);
       
     } catch (error) {
       console.error('Error fetching community with membership:', error);
@@ -165,7 +165,7 @@ export default function NonProfitCommunityScreen({ route }) {
       }
 
       setIsFriend(!!data);
-      console.log('Friendship status:', !!data);
+      //console.log('Friendship status:', !!data);
     } catch (error) {
       console.error('Error checking friendship status:', error);
     }
