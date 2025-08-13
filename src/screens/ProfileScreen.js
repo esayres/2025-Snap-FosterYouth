@@ -28,7 +28,7 @@ export default function ProfileScreen() {
 
   // Community data - Better Youth
   const userCommunities = [
-    { id: 1, name: "Better Youth", memberCount: 156 },
+    { id: 1, name: "Better Youth", memberCount: 158 },
   ];
 
   useEffect(() => {

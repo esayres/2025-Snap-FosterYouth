@@ -299,13 +299,35 @@ export default function NonProfitCommunityScreen({ route }) {
     }
   };
 
-  const handleAskQuestion = () => {
-    // Navigate to question asking screen
-    navigation.navigate('AskQuestion', { 
-      communityId: communityData?.id,
-      communityName: communityData?.name 
-    });
-  };
+const handleAskQuestion = () => {
+  Alert.prompt(
+    'Ask a Question',
+    `What would you like to know about ${communityData?.name || 'this community'}?`,
+    [
+      { 
+        text: 'Cancel', 
+        style: 'cancel' 
+      },
+      { 
+        text: 'Submit', 
+        onPress: (text) => {
+          if (text && text.trim()) {
+            Alert.alert(
+              'Thanks!', 
+              'Your question has been submitted. The community will get back to you soon!',
+              [{ text: 'OK', style: 'default' }]
+            );
+          } else {
+            Alert.alert('Error', 'Please enter a question before submitting.');
+          }
+        }
+      }
+    ],
+    'plain-text',
+    '', 
+    'default' 
+  );
+};
 
   const handleJoinGroupChat = () => {
     // Navigate to group chat
