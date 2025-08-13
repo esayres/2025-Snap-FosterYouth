@@ -138,6 +138,8 @@ const collapseDrawer = () => {
     const address = profileData[indexPoint]?.address; // address of the Non-Profit
     const phoneNumber = profileData[indexPoint]?.phoneNumber; // phone number of the Non-Profit
     const storedTags = profileData[indexPoint]?.tags || []; // tags of the Non-Profit, default to empty array if not present
+
+    //name, members, web
     
     // --- State ---
     const [isExpanded, setIsExpanded] = useState(false);
@@ -230,6 +232,24 @@ const updateProfileTags = async (updatedTags) => {
   }
 };
 
+const fetchUserById = async (id) => {
+  console.log("THIS IS ID NUMBER: ", id)
+  const { data, error } = await supabase
+    .from('communities')           // replace with your actual table name
+    .select('*')             // or just the fields you need
+    .eq('id', id)            // filter where id = 4
+    .single();               // tells Supabase to return one row (not array)
+
+  if (error) {
+    console.error('Error fetching user:', error);
+    return null;
+  }
+
+  //console.log('User row:', data);
+  navigation.navigate("NonProfitCommunity", {communityUsername: data.username,});
+  return data;
+};
+
 
   // --- Render ---
   return (
@@ -277,7 +297,7 @@ const updateProfileTags = async (updatedTags) => {
             <View style={styles.profileInfo}>
               <View style={styles.nameRow}>
                 <Text style={styles.name} onPress={() => {
-                  navigation.navigate("NonProfitCommunity");
+                  fetchUserById(profileData[indexPoint].id)
                 }}>{name}</Text>
                 <Ionicons name="checkmark-circle" size={20} color="#00D4AA" />
               </View>
