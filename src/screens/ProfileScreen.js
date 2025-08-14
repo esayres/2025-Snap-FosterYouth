@@ -56,9 +56,13 @@ export default function ProfileScreen() {
     <ScrollView contentContainerStyle={styles.scrollContainer}>
       <View style={styles.profileSection}>
         <Image
-          source={{ uri: "https://i.imgur.com/NeWYyLe.png" }}
-          style={styles.avatar}
-        />
+        source={{
+          uri: user?.user_metadata?.email?.includes('justine-chen')
+            ? "https://i.imgur.com/NeWYyLe.png"  // justine-chen bitmoji
+            : "https://i.imgur.com/FxsJ3xy.jpg" // default avatar
+        }}
+        style={styles.avatar}
+      />
         <Text style={styles.username}>
           {user &&
             user.user_metadata &&

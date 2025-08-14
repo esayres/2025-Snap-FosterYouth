@@ -20,31 +20,24 @@ export default function Header({ title }) {
   const navigation = useNavigation();
 
   const [profilePicUrl, setProfilePicUrl] = useState(
-    "https://i.imgur.com/NeWYyLe.png",
+    "https://i.imgur.com/FxsJ3xy.png",
   );
 
   const { user } = useAuthentication();
 
   useEffect(() => {
-    async function fetchProfilePic() {
-      if (user === null) {
-        return;
-      }
-
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("avatar_url")
-        .eq("id", user.id)
-        .single();
-
-      if (error) {
-        console.log("Profile pic fetch failure");
-      } else if (data.avatar_url) {
-        setProfilePicUrl(data.avatar_url);
-      }
+    if (user === null) {
+      setProfilePicUrl("https://i.imgur.com/FxsJ3xy.jpg"); // default when no user
+      return;
     }
-
-    fetchProfilePic();
+    // Get username from email (part before @)
+    const username = user?.user_metadata?.email?.split('@')[0];
+    // If username is justine-chen, use special pic, otherwise use default
+    if (username === 'justine-chen') {
+      setProfilePicUrl("https://i.imgur.com/NeWYyLe.png");
+    } else {
+      setProfilePicUrl("https://i.imgur.com/FxsJ3xy.jpg");
+    }
   }, [user]);
 
   const [showMenu, setShowMenu] = useState(false);
